@@ -6,7 +6,7 @@
 
 // Returns the position (1-indexed) in the array
 // where the opening and closing parentheses dont match
-// Returns 0 if all of them are matched
+// Returns 0 if they all match
 int find_parentheses_mismatch(char *parens, size_t len) {
     char buffer[len];
     Stack stack = stk_init(buffer);
@@ -51,6 +51,7 @@ int precedence(char ch) {
     }
 }
 
+// Converts an infix expression to postfix
 // a b c * + == a + (b * c) 
 void infix_to_postfix(char *infix_str, char *postfix_str, size_t len) {
     char buffer[len];
@@ -59,16 +60,14 @@ void infix_to_postfix(char *infix_str, char *postfix_str, size_t len) {
     size_t j = 0;
     for (size_t i = 0; i < len; i++) {
         char ch = infix_str[i];
-        // checks for characters
-        if (ch >= 97 && ch <= 122) {
+        // checks for operators (a to z and A to Z)
+        if (ch >= 97 && ch <= 122 || ch >= 65 && ch <= 90) {
             postfix_str[j++] = ch;
-            // putchar(ch);
         }
         // checks for operators
         else if (ch == '+' || ch == '-' || ch == '*' || ch == '/') {
             while (precedence(stack.data[stack.top]) >= precedence(ch)) {
                 postfix_str[j++] = stk_pop(&stack);
-                // putchar(ch);
             }
             stk_push(&stack, ch);
         }
@@ -81,7 +80,6 @@ void infix_to_postfix(char *infix_str, char *postfix_str, size_t len) {
             char tmp;
             while ((tmp = stk_pop(&stack)) != '(') {
                 postfix_str[j++] = tmp;
-                // putchar(ch);
             }
         }
     }
@@ -90,13 +88,9 @@ void infix_to_postfix(char *infix_str, char *postfix_str, size_t len) {
     while (stack.top != -1) {
         char ch = stk_pop(&stack);
         postfix_str[j++] = ch;
-        // putchar(ch);
     }
     postfix_str[j] = '\0';
-    printf("%s", postfix_str);
 } 
-
-
 
 
 int main(int argc, char** argv) {
@@ -121,6 +115,7 @@ int main(int argc, char** argv) {
 
     char postfix[size];
     infix_to_postfix(str, postfix, size);
+    printf("%s\n", postfix);
 
     putchar('\n');
     return 0;
