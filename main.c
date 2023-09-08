@@ -35,6 +35,70 @@ int find_parentheses_mismatch(char *parens, size_t len) {
 }
 
 
+int precedence(char ch) {
+    switch (ch) {
+        case '+':
+        case '-':
+            return 1;
+
+        case '*':
+        case '/':
+            return 2;
+
+        case '(':
+        default:
+            return 0;
+    }
+}
+
+// a b c * + == a + (b * c) 
+void infix_to_postfix(char *infix_str, char *postfix_str, size_t len) {
+    char buffer[len];
+    Stack stack = stk_init(buffer);
+
+    size_t j = 0;
+    for (size_t i = 0; i < len; i++) {
+        char ch = infix_str[i];
+        // checks for characters
+        if (ch >= 97 && ch <= 122) {
+            postfix_str[j++] = ch;
+            // putchar(ch);
+        }
+        // checks for operators
+        else if (ch == '+' || ch == '-' || ch == '*' || ch == '/') {
+            while (precedence(stack.data[stack.top]) >= precedence(ch)) {
+                postfix_str[j++] = stk_pop(&stack);
+                // putchar(ch);
+            }
+            stk_push(&stack, ch);
+        }
+        // checks for opening parentheses
+        else if (ch == '(') {
+            stk_push(&stack, ch);
+        }
+        // checks for closing parentheses
+        else if (ch == ')') {
+            char tmp;
+            while ((tmp = stk_pop(&stack)) != '(') {
+                postfix_str[j++] = tmp;
+                // putchar(ch);
+            }
+        }
+    }
+
+    // Empty out the stack
+    while (stack.top != -1) {
+        char ch = stk_pop(&stack);
+        postfix_str[j++] = ch;
+        // putchar(ch);
+    }
+    postfix_str[j] = '\0';
+    printf("%s", postfix_str);
+} 
+
+
+
+
 int main(int argc, char** argv) {
     argv++;
     char *str = *argv;
@@ -54,6 +118,9 @@ int main(int argc, char** argv) {
         fprintf(stderr, "Mismatched Parentheses at index: %d\n", index);
         exit(1);
     }
+
+    char postfix[size];
+    infix_to_postfix(str, postfix, size);
 
     putchar('\n');
     return 0;
